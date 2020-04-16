@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qeydlerim/providers/notes.dart';
 import 'package:qeydlerim/screens/home.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
-
+void main() {
+  runApp(
+    ChangeNotifierProvider<NotesProvider>(
+      create: (context) => NotesProvider(),
+      child: MyApp(),
+    ),
+  );
+  // SystemChrome.setEnabledSystemUIOverlays([]);
+  SystemChrome.setPreferredOrientations(
+    [
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ],
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Qeydlərim',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
         textTheme: TextTheme(
-          headline: TextStyle(
-              fontFamily: 'Quicksand',
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              fontSize: 24),
-          body1: TextStyle(
-              fontFamily: 'Quicksand',
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              fontSize: 20),
-          body2: TextStyle(
-              fontFamily: 'Quicksand',
-              fontWeight: FontWeight.normal,
-              color: Colors.black,
-              fontSize: 18),
-          subtitle: TextStyle(
-              fontFamily: 'Quicksand',
-              fontWeight: FontWeight.normal,
-              color: Colors.black,
-              fontSize: 14),
+          body1: TextStyle(fontSize: 20.0),
         ),
+        fontFamily: "Exo2",
+        primaryColor: Colors.black,
+        accentColor: Colors.black,
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: Home(),
+      title: "DailyJ",
     );
   }
 }
