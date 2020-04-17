@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: TextTheme(
           body1: TextStyle(fontSize: 20.0),
+          body2: TextStyle(fontSize: 18.0),
         ),
         fontFamily: "Exo2",
         primaryColor: Colors.black,
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       home: Home(),
-      title: "DailyJ",
+      title: "Qeydlərim",
     );
   }
 }

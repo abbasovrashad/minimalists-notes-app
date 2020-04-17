@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 
 class NotesProvider with ChangeNotifier {
-  int axisCount = 2;
+  String title;
+  String description;
+  bool showFAB = false;
 
-  void changeView() {
-    axisCount = axisCount == 1 ? 2 : 1;
-    notifyListeners();
-
+  void nullify(){
+    title = null;
+    description = null;
+    showFAB = false;
   }
 }

@@ -3,20 +3,28 @@ class Note {
   String _title;
   String _description;
   String _date;
-  int _priority, _color;
+  int _priority;
 
-  Note(this._title, this._date, this._priority, this._color,
-      [this._description]);
+  Note(
+    this._title,
+    this._description,
+    this._date,
+    this._priority,
+  );
 
-  Note.withID(this._id, this._title, this._description, this._date,
-      this._priority, this._color);
+  Note.withID(
+    this._id,
+    this._title,
+    this._description,
+    this._date,
+    this._priority,
+  );
 
   int get id => _id;
   String get title => _title;
   String get description => _description;
   String get date => _date;
   int get priority => _priority;
-  int get color => _color;
 
   set title(String title) {
     if (title.length <= 255) this._title = title;
@@ -26,12 +34,8 @@ class Note {
     if (description.length <= 255) this.description = _description;
   }
 
-  set priority(int priority) {
-    if (priority >= 1 && priority <= 3) this._priority = priority;
-  }
-
-  set color(int color) {
-    if (color >= 0 && color <= 9) this._color = color;
+  set color(int priority) {
+    if (priority >= 0 && priority <= 3) this._priority = priority;
   }
 
   set date(String date) {
@@ -44,7 +48,6 @@ class Note {
       "title": _title,
       "description": _description,
       "priority": _priority,
-      "color": _color,
       "date": _date,
     };
   }
@@ -54,7 +57,6 @@ class Note {
     this._title = map["title"];
     this._description = map["description"];
     this._priority = map["priority"];
-    this._color = map["color"];
     this._date = map["date"];
   }
 }

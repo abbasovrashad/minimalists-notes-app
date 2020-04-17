@@ -1,13 +1,46 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qeydlerim/models/note.dart';
 import 'package:qeydlerim/providers/notes.dart';
 import 'package:qeydlerim/screens/add.dart';
+import 'package:qeydlerim/screens/view.dart';
+import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/menudrawer.dart';
+import 'package:qeydlerim/widgets/notecard.dart';
+import 'package:sqflite/sqflite.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final List notes = ["salam", "aleykum", "necesen"];
+  DatabaseService databaseService = new DatabaseService();
+
+  List<Note> notes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _updateNotesList();
+  }
+
+  Future<List<Note>> _updateNotesList() async {
+    Future<Database> init = databaseService.initializeDatabase();
+    init.then((database) {
+      Future<List<Note>> listOfNotes = databaseService.getNoteList();
+      listOfNotes.then((notesList) {
+        return listOfNotes;
+      });
+    });
+
+    await databaseService.getNoteList().then((notesList) => notes = notesList);
+    return notes;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,34 +65,35 @@ class Home extends StatelessWidget {
               ? <Widget>[]
               : <Widget>[
                   IconButton(
-                    icon: Icon(
-                      notesProvider.axisCount == 2
-                          ? Icons.view_headline
-                          : Icons.view_comfy,
-                      color: Colors.black,
-                    ),
-                    onPressed: () => notesProvider.changeView(),
-                  ),
-                  IconButton(
                     icon: Icon(Icons.search, color: Colors.black),
                     onPressed: () {},
                   ),
                 ],
         ),
-        body: notes.length == 0
-            ? Center(
+        body: FutureBuilder(
+          future: _updateNotesList(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                  child: Text("...", style: TextStyle(fontSize: 50.0)));
+            }
+            if (snapshot.data.length == 0) {
+              return Center(
                 child: Text(
                   "Qeydləriniz yoxdur.",
                   style: Theme.of(context).textTheme.body1,
                 ),
-              )
-            : displayNotes(notesProvider),
-        floatingActionButton: FloatingActionButton(
+              );
+            }
+            return displayNotes(snapshot.data);
+          },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(5.0),
           ),
           tooltip: "Əlavə et",
-          child: Icon(Icons.add),
+          label: Icon(Icons.add),
           onPressed: () => Navigator.push(
               context, CupertinoPageRoute(builder: (context) => Add())),
         ),
@@ -67,20 +101,21 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget displayNotes(notesProvider) => GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: notesProvider.axisCount,
-          childAspectRatio: 3.0,
+  Widget displayNotes(notesProvider) => AnimationLimiter(
+        child: ListView.builder(
+          itemCount: notes.length,
+          itemBuilder: (context, index) {
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: NoteCard(note: notes[index]),
+                ),
+              ),
+            );
+          },
         ),
-        itemCount: notes.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            color: index % 2 == 0 ? Colors.grey[100] : Colors.grey[50],
-            child: Text(notes[index]),
-          );
-        },
       );
 }

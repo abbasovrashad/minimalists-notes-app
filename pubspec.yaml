@@ -13,7 +13,8 @@ dependencies:
   sqflite:
   path_provider:
   intl:
-  flutter_staggered_grid_view:
+  fluttertoast:
+  flutter_staggered_animations:
   
   cupertino_icons: ^0.1.2
 
@@ -25,12 +26,6 @@ flutter:
   uses-material-design: true
   
   fonts:
-    - family: Quicksand
-      fonts:
-        - asset: assets/fonts/Quicksand-Regular.ttf
-    - family: Ubuntu
-      fonts:
-        - asset: assets/fonts/Ubuntu-Regular.ttf
     - family: Exo2
       fonts:
         - asset: assets/fonts/Exo2-Regular.ttf

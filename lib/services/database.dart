@@ -38,7 +38,7 @@ class DatabaseService {
 
   void _createDB(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE $table($id INTEGER PRIMARY KEY AUTOINCREMENT, $title TEXT, $description TEXT, $priority INTEGER, $color INTEGER, $date TEXT)");
+        "CREATE TABLE $table($id INTEGER PRIMARY KEY AUTOINCREMENT, $title TEXT, $description TEXT, $priority INTEGER, $color INTEGER, $date int)");
   }
 
   Future<List<Map<String, dynamic>>> getNoteMapList() async {
@@ -54,14 +54,17 @@ class DatabaseService {
 
   Future<int> update(Note note) async {
     Database db = await this.database;
-    return await db
-        .update(table, note.toMap(), where: "$id = ?", whereArgs: [note.id]);
+    return await db.update(
+      table,
+      note.toMap(),
+      where: "$id = ?",
+      whereArgs: [note.id],
+    );
   }
 
   Future<int> delete(int id) async {
     Database db = await this.database;
-
-    return await db.rawDelete("DELETE FROM $table WHERE $id = $id");
+    return await db.rawDelete("DELETE FROM $table WHERE ${this.id} = $id");
   }
 
   Future<int> getCount() async {
@@ -78,5 +81,6 @@ class DatabaseService {
     for (int i = 0; i < noteMapList.length; i++) {
       notes.add(Note.fromMap(noteMapList[i]));
     }
+    return notes;
   }
 }
