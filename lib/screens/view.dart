@@ -23,6 +23,7 @@ class _ViewState extends State<View> {
     titleController.text = widget.note.title;
     descriptionController.text = widget.note.description;
     Provider.of<NotesProvider>(context, listen: false).showFAB = false;
+    print(widget.note.isArchieved);
   }
 
   @override
@@ -49,15 +50,6 @@ class _ViewState extends State<View> {
               border: InputBorder.none,
             ),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.delete_forever,
-                color: Colors.black,
-              ),
-              onPressed: () => _deleteDialog(widget.note.id),
-            ),
-          ],
           elevation: 0.0,
           backgroundColor: Colors.white,
         ),
@@ -77,7 +69,33 @@ class _ViewState extends State<View> {
               border: InputBorder.none,
             ),
             maxLines: (MediaQuery.of(context).size.height).ceil(),
-            // decoration: ,
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.black,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.share, color: Colors.white),
+                onPressed: () => _share(widget.note),
+              ),
+              IconButton(
+                icon: Icon(Icons.delete, color: Colors.white),
+                onPressed: () =>
+                    _deleteDialog(widget.note.id, widget.note.isDeleted),
+              ),
+              IconButton(
+                icon: Icon(
+                    widget.note.isArchieved == 1
+                        ? Icons.unarchive
+                        : Icons.archive,
+                    color: Colors.white),
+                onPressed: () => widget.note.isArchieved == 1
+                    ? _unarchieve(widget.note.id)
+                    : _archieve(widget.note.id),
+              ),
+            ],
           ),
         ),
         floatingActionButton: notesProvider.showFAB
@@ -94,7 +112,37 @@ class _ViewState extends State<View> {
     );
   }
 
-  void _deleteDialog(int id) async {
+  void _share(Note note) {}
+
+  void _archieve(int id) async {
+    await databaseService.archieveNote(id);
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+      msg: "QEYD ARXİVLƏNDİ!",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 18.0,
+    );
+  }
+
+  void _unarchieve(int id) async {
+    await databaseService.unarchieveNote(id);
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+      msg: "QEYD ARXİVDƏN ÇIXARILDI!",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 18.0,
+    );
+  }
+
+  void _deleteDialog(int id, int isDeleted) async {
     return showDialog(
       context: context,
       builder: (context) {
@@ -120,9 +168,7 @@ class _ViewState extends State<View> {
                       .copyWith(color: Colors.white),
                 ),
                 onPressed: () {
-                  _delete(id);
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                  _delete(id, isDeleted);
                 },
               ),
             ],
@@ -137,16 +183,17 @@ class _ViewState extends State<View> {
 
   void _update(notesProvider) async {
     Note updatedNote = new Note.withID(
-      widget.note.id,
-      titleController.text,
-      descriptionController.text,
-      widget.note.date,
-      1,
-    );
+        widget.note.id,
+        titleController.text,
+        descriptionController.text,
+        widget.note.date,
+        1,
+        widget.note.isArchieved,
+        widget.note.isDeleted);
 
     databaseService.update(updatedNote);
     Fluttertoast.showToast(
-      msg: "DƏYİŞİKLİKLƏR SAXLANILDI!",
+      msg: "DƏYİŞİKLİKLƏR SAXLANILDI",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
       timeInSecForIosWeb: 1,
@@ -156,16 +203,31 @@ class _ViewState extends State<View> {
     );
   }
 
-  void _delete(int id) async {
-    databaseService.delete(id);
-    Fluttertoast.showToast(
-      msg: "QEYD SİLİNDİ!",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green[400],
-      textColor: Colors.white,
-      fontSize: 18.0,
-    );
+  void _delete(int id, int isDeleted) async {
+    if (isDeleted == 0) {
+      await databaseService.moveToDeletedNotes(id);
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: "QEYD SİLİNƏNLƏRƏ DAŞINDI",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 18.0,
+      );
+    } else {
+      await databaseService.deleteCompletely(id);
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: "QEYD SİLİNDİ",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 18.0,
+      );
+    }
   }
 }

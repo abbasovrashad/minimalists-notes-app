@@ -1,16 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:qeydlerim/models/note.dart';
-import 'package:qeydlerim/providers/notes.dart';
 import 'package:qeydlerim/screens/add.dart';
-import 'package:qeydlerim/screens/view.dart';
 import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/menudrawer.dart';
 import 'package:qeydlerim/widgets/notecard.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:qeydlerim/widgets/threedots.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -19,32 +15,18 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   DatabaseService databaseService = new DatabaseService();
 
   List<Note> notes = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _updateNotesList();
-  }
-
-  Future<List<Note>> _updateNotesList() async {
-    Future<Database> init = databaseService.initializeDatabase();
-    init.then((database) {
-      Future<List<Note>> listOfNotes = databaseService.getNoteList();
-      listOfNotes.then((notesList) {
-        return listOfNotes;
-      });
-    });
-
+  Future<List<Note>> _getNotes() async {
     await databaseService.getNoteList().then((notesList) => notes = notesList);
     return notes;
   }
 
   @override
   Widget build(BuildContext context) {
-    var notesProvider = Provider.of<NotesProvider>(context);
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
@@ -71,11 +53,10 @@ class _HomeState extends State<Home> {
                 ],
         ),
         body: FutureBuilder(
-          future: _updateNotesList(),
+          future: _getNotes(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(
-                  child: Text("...", style: TextStyle(fontSize: 50.0)));
+              return ThreeDots();
             }
             if (snapshot.data.length == 0) {
               return Center(
@@ -85,7 +66,7 @@ class _HomeState extends State<Home> {
                 ),
               );
             }
-            return displayNotes(snapshot.data);
+            return displayNotes(snapshot);
           },
         ),
         floatingActionButton: FloatingActionButton.extended(
@@ -101,9 +82,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget displayNotes(notesProvider) => AnimationLimiter(
+  Widget displayNotes(snapshot) => AnimationLimiter(
         child: ListView.builder(
-          itemCount: notes.length,
+          itemCount: snapshot.data.length,
           itemBuilder: (context, index) {
             return AnimationConfiguration.staggeredList(
               position: index,
@@ -111,7 +92,7 @@ class _HomeState extends State<Home> {
               child: SlideAnimation(
                 verticalOffset: 50.0,
                 child: FadeInAnimation(
-                  child: NoteCard(note: notes[index]),
+                  child: NoteCard(note: snapshot.data[index]),
                 ),
               ),
             );

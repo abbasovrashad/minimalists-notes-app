@@ -11,7 +11,7 @@ void main() {
       child: MyApp(),
     ),
   );
-  // SystemChrome.setEnabledSystemUIOverlays([]);
+  
   SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitDown,
@@ -29,6 +29,10 @@ class MyApp extends StatelessWidget {
         textTheme: TextTheme(
           body1: TextStyle(fontSize: 20.0),
           body2: TextStyle(fontSize: 18.0),
+        ),
+        appBarTheme: AppBarTheme(
+          color: Colors.white,
+          elevation: 0.0,
         ),
         fontFamily: "Exo2",
         primaryColor: Colors.black,

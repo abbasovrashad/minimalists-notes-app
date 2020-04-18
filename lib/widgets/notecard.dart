@@ -10,8 +10,8 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          CupertinoPageRoute(builder: (context) => View(note: note))),
+      onTap: () => Navigator.push(
+          context, CupertinoPageRoute(builder: (context) => View(note: note))),
       child: Column(
         children: <Widget>[
           Container(

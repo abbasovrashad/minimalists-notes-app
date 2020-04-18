@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:qeydlerim/models/note.dart';
 
 class NotesProvider with ChangeNotifier {
   String title;
@@ -10,4 +11,7 @@ class NotesProvider with ChangeNotifier {
     description = null;
     showFAB = false;
   }
+
+  List<Note> notes = new List<Note>();
+  List<Note> archievedNotes = new List<Note>();
 }

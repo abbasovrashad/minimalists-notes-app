@@ -17,7 +17,7 @@ class _AddState extends State<Add> {
   @override
   Widget build(BuildContext context) {
     var notesProvider = Provider.of<NotesProvider>(context);
-
+    notesProvider.nullify();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -89,15 +89,17 @@ class _AddState extends State<Add> {
         notesProvider.description,
         DateTime.now().toIso8601String(),
         1,
+        0,
+        0
       );
-      notesProvider.nullify();
+
       await databaseService.insert(note);
       Fluttertoast.showToast(
         msg: "QEYD ƏLAVƏ OLUNDU!",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green[400],
+        backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 18.0,
       );
