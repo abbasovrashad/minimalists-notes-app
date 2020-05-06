@@ -7,6 +7,7 @@ import 'package:qeydlerim/screens/view.dart';
 class NoteCard extends StatelessWidget {
   final Note note;
   NoteCard({this.note});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

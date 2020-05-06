@@ -31,55 +31,67 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         key: _scaffoldKey,
         drawer: MenuDrawer(),
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.sort, color: Colors.black),
-            onPressed: () => _scaffoldKey.currentState.openDrawer(),
-          ),
-          backgroundColor: Colors.white,
-          title: Text(
-            "Qeydlərim",
-            style: TextStyle(color: Colors.black),
-          ),
-          centerTitle: true,
-          elevation: 0.0,
-          actions: notes.isEmpty
-              ? <Widget>[]
-              : <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.search, color: Colors.black),
-                    onPressed: () {},
-                  ),
-                ],
-        ),
-        body: FutureBuilder(
-          future: _getNotes(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return ThreeDots();
-            }
-            if (snapshot.data.length == 0) {
-              return Center(
-                child: Text(
-                  "Qeydləriniz yoxdur.",
-                  style: Theme.of(context).textTheme.body1,
-                ),
-              );
-            }
-            return displayNotes(snapshot);
-          },
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          tooltip: "Əlavə et",
-          label: Icon(Icons.add),
-          onPressed: () => Navigator.push(
-              context, CupertinoPageRoute(builder: (context) => Add())),
-        ),
+        appBar: _appBar(),
+        body: _body(),
+        floatingActionButton: _addButton(context),
       ),
     );
+  }
+
+  FloatingActionButton _addButton(BuildContext context) {
+    return FloatingActionButton.extended(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        tooltip: "Add",
+        label: Icon(Icons.add),
+        onPressed: () => Navigator.push(
+            context, CupertinoPageRoute(builder: (context) => Add())),
+      );
+  }
+
+  FutureBuilder<List<Note>> _body() {
+    return FutureBuilder(
+        future: _getNotes(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return ThreeDots();
+          }
+          if (snapshot.data.length == 0) {
+            return Center(
+              child: Text(
+                "No notes, yet.",
+                style: Theme.of(context).textTheme.body1,
+              ),
+            );
+          }
+          return displayNotes(snapshot);
+        },
+      );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.sort, color: Colors.black),
+          onPressed: () => _scaffoldKey.currentState.openDrawer(),
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          "myMinimalNotes",
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: notes.isEmpty
+            ? <Widget>[]
+            : <Widget>[
+                IconButton(
+                  icon: Icon(Icons.search, color: Colors.black),
+                  onPressed: () {},
+                ),
+              ],
+      );
   }
 
   Widget displayNotes(snapshot) => AnimationLimiter(

@@ -5,12 +5,7 @@ import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/notecard.dart';
 import 'package:qeydlerim/widgets/threedots.dart';
 
-class Archieved extends StatefulWidget {
-  @override
-  _ArchievedState createState() => _ArchievedState();
-}
-
-class _ArchievedState extends State<Archieved> {
+class Archieved extends StatelessWidget {
   DatabaseService databaseService = new DatabaseService();
 
   List<Note> archievedNotes = [];
@@ -26,32 +21,40 @@ class _ArchievedState extends State<Archieved> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            "Arxiv",
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-        body: FutureBuilder(
-          future: _getArchievedNotes(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return ThreeDots();
-            }
-            if (snapshot.data.isEmpty) {
-              return Center(
-                child: Text("Arxivlənmiş qeydiniz yoxdu."),
-              );
-            }
-            return _displayArchievedNotes(snapshot.data);
-          },
-        ),
+        appBar: _appBar(context),
+        body: _body(),
       ),
     );
+  }
+
+  FutureBuilder _body() {
+    return FutureBuilder(
+        future: _getArchievedNotes(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return ThreeDots();
+          }
+          if (snapshot.data.isEmpty) {
+            return Center(
+              child: Text("No archieved notes."),
+            );
+          }
+          return _displayArchievedNotes(snapshot.data);
+        },
+      );
+  }
+
+  AppBar _appBar(BuildContext context) {
+    return AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Archieve",
+          style: TextStyle(color: Colors.black),
+        ),
+      );
   }
 
   Widget _displayArchievedNotes(List<Note> archievedNotes) {

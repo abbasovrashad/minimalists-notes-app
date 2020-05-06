@@ -13,7 +13,7 @@ class MenuDrawer extends StatelessWidget {
           children: <Widget>[
             DrawerHeader(
               child: Text(
-                "Qeydlərim",
+                "myMinimalNotes",
                 style: Theme.of(context)
                     .textTheme
                     .body1
@@ -22,7 +22,7 @@ class MenuDrawer extends StatelessWidget {
               ),
             ),
             InkWell(
-              child: _listTile("Arxiv", context),
+              child: _listTile("Archieve", context),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context,
@@ -35,7 +35,7 @@ class MenuDrawer extends StatelessWidget {
                   Navigator.push(context,
                       CupertinoPageRoute(builder: (context) => Deleted()));
                 },
-                child: _listTile("Silinənlər", context)),
+                child: _listTile("Deleteds", context)),
             // _listTile("Ayarlar", context),
           ],
         ),

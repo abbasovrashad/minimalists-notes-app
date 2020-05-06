@@ -78,19 +78,6 @@ class DatabaseService {
     return await db.rawDelete("DELETE FROM $notetable WHERE $COL_ID = $id");
   }
 
-  // Future<int> getCount() async {
-  //   Database db = await this.database;
-  //   List<Map<String, dynamic>> x =
-  //       await db.rawQuery("SELECT COUNT (*) from $notetable");
-  //   return Sqflite.firstIntValue(x);
-  // }
-
-  // Future<List<Map<String, dynamic>>> getNoteMapList() async {
-  //   Database db = await this.database;
-
-  //   return await db.query(notetable, orderBy: "$COL_PRIORITY ASC");
-  // }
-
   Future<List<Note>> getNoteList() async {
     Database db = await this.database;
     List<Map<String, dynamic>> noteMapList = await db

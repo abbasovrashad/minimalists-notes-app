@@ -32,96 +32,106 @@ class _ViewState extends State<View> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: TextField(
-            onTap: () => notesProvider.showFAB = true,
-            style: Theme.of(context).textTheme.body1,
-            onChanged: (title) => notesProvider.title = title,
-            controller: titleController,
-            decoration: InputDecoration(
-              hintStyle: Theme.of(context)
-                  .textTheme
-                  .body1
-                  .copyWith(color: Colors.black54),
-              border: InputBorder.none,
-            ),
-          ),
-          elevation: 0.0,
-          backgroundColor: Colors.white,
-        ),
-        body: Container(
-          margin: const EdgeInsets.all(15.0),
-          child: TextField(
-            onTap: () => notesProvider.showFAB = true,
-            controller: descriptionController,
-            onChanged: (description) => notesProvider.description = description,
-            style: Theme.of(context).textTheme.body1,
-            decoration: InputDecoration(
-              hintText: "qeydiniz..",
-              hintStyle: Theme.of(context)
-                  .textTheme
-                  .body1
-                  .copyWith(color: Colors.black54),
-              border: InputBorder.none,
-            ),
-            maxLines: (MediaQuery.of(context).size.height).ceil(),
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.black,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.share, color: Colors.white),
-                onPressed: () => _share(widget.note),
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: Colors.white),
-                onPressed: () =>
-                    _deleteDialog(widget.note.id, widget.note.isDeleted),
-              ),
-              IconButton(
-                icon: Icon(
-                    widget.note.isArchieved == 1
-                        ? Icons.unarchive
-                        : Icons.archive,
-                    color: Colors.white),
-                onPressed: () => widget.note.isArchieved == 1
-                    ? _unarchieve(widget.note.id)
-                    : _archieve(widget.note.id),
-              ),
-            ],
-          ),
-        ),
+        appBar: _appBar(notesProvider),
+        body: _body(notesProvider),
+        bottomNavigationBar: _bottomAppBar(),
         floatingActionButton: notesProvider.showFAB
-            ? FloatingActionButton.extended(
-                backgroundColor: Colors.black,
-                onPressed: () => _update(notesProvider),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                label: Icon(Icons.save),
-              )
+            ? _saveButton(notesProvider)
             : SizedBox.shrink(),
       ),
     );
   }
 
-  void _share(Note note) {}
+  Widget _body(notesProvider) => Container(
+        margin: const EdgeInsets.all(15.0),
+        child: TextField(
+          onTap: () => notesProvider.showFAB = true,
+          controller: descriptionController,
+          onChanged: (description) => notesProvider.description = description,
+          style: Theme.of(context).textTheme.body1,
+          decoration: InputDecoration(
+            hintText: "[your note here..]",
+            hintStyle: Theme.of(context)
+                .textTheme
+                .body1
+                .copyWith(color: Colors.black54),
+            border: InputBorder.none,
+          ),
+          maxLines: (MediaQuery.of(context).size.height).ceil(),
+        ),
+      );
+
+  BottomAppBar _bottomAppBar() => BottomAppBar(
+        color: Colors.black,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.share, color: Colors.white),
+              onPressed: () => _share(widget.note),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.white),
+              onPressed: () =>
+                  _deleteDialog(widget.note.id, widget.note.isDeleted),
+            ),
+            IconButton(
+              icon: Icon(
+                  widget.note.isArchieved == 1
+                      ? Icons.unarchive
+                      : Icons.archive,
+                  color: Colors.white),
+              onPressed: () => widget.note.isArchieved == 1
+                  ? _unarchieve(widget.note.id)
+                  : _archieve(widget.note.id),
+            ),
+          ],
+        ),
+      );
+
+  FloatingActionButton _saveButton(notesProvider) =>
+      FloatingActionButton.extended(
+        backgroundColor: Colors.black,
+        onPressed: () => _update(notesProvider),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        label: Icon(Icons.save),
+      );
+
+  AppBar _appBar(notesProvider) => AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: TextField(
+          onTap: () => notesProvider.showFAB = true,
+          style: Theme.of(context).textTheme.body1,
+          onChanged: (title) => notesProvider.title = title,
+          controller: titleController,
+          decoration: InputDecoration(
+            hintStyle: Theme.of(context)
+                .textTheme
+                .body1
+                .copyWith(color: Colors.black54),
+            border: InputBorder.none,
+          ),
+        ),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+      );
+
+  void _share(Note note) {
+    // TODO: add share functionality
+  }
 
   void _archieve(int id) async {
     await databaseService.archieveNote(id);
     Navigator.pop(context);
     Fluttertoast.showToast(
-      msg: "QEYD ARXİVLƏNDİ!",
+      msg: "NOTE ARCHIVED",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
       backgroundColor: Colors.black,
       textColor: Colors.white,
       fontSize: 18.0,
@@ -132,10 +142,9 @@ class _ViewState extends State<View> {
     await databaseService.unarchieveNote(id);
     Navigator.pop(context);
     Fluttertoast.showToast(
-      msg: "QEYD ARXİVDƏN ÇIXARILDI!",
+      msg: "NOTE UNARCHIVED",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
       backgroundColor: Colors.black,
       textColor: Colors.white,
       fontSize: 18.0,
@@ -148,20 +157,20 @@ class _ViewState extends State<View> {
       builder: (context) {
         return AlertDialog(
           title: Text(
-            "QEYD SİLİNSİN?",
+            "SURE TO DELETE THE NOTE?",
             textAlign: TextAlign.center,
           ),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               FlatButton(
-                child: Text("xeyr", style: Theme.of(context).textTheme.body1),
+                child: Text("NO", style: Theme.of(context).textTheme.body1),
                 onPressed: () => Navigator.pop(context),
               ),
               FlatButton(
                 color: Colors.black,
                 child: Text(
-                  "bəli",
+                  "YES",
                   style: Theme.of(context)
                       .textTheme
                       .body1
@@ -193,10 +202,9 @@ class _ViewState extends State<View> {
 
     databaseService.update(updatedNote);
     Fluttertoast.showToast(
-      msg: "DƏYİŞİKLİKLƏR SAXLANILDI",
+      msg: "CHANGES SAVED",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
       backgroundColor: Colors.green[400],
       textColor: Colors.white,
       fontSize: 18.0,
@@ -208,10 +216,9 @@ class _ViewState extends State<View> {
       await databaseService.moveToDeletedNotes(id);
       Navigator.pop(context);
       Fluttertoast.showToast(
-        msg: "QEYD SİLİNƏNLƏRƏ DAŞINDI",
+        msg: "NOTE MOVED TO DELETEDS",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
         backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 18.0,
@@ -220,14 +227,20 @@ class _ViewState extends State<View> {
       await databaseService.deleteCompletely(id);
       Navigator.pop(context);
       Fluttertoast.showToast(
-        msg: "QEYD SİLİNDİ",
+        msg: "NOTE DELETED PERMANENTLY",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
         backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 18.0,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 }
