@@ -14,7 +14,8 @@ Feel free to clone, pull, fork, star, open an issue, make changes and commit new
 
 ## TODO Roadmap
 - :x: Undo deleted note;
-- :x: Add settings page;
+- :x: Settings page;
+- :x: Share note;
 
 ## Used packages
 -  provider
