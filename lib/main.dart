@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qeydlerim/providers/notes.dart';
-import 'package:qeydlerim/screens/home.dart';
 import 'package:provider/provider.dart';
+import 'package:qeydlerim/screens/screens.dart';
 
 void main() {
   runApp(
@@ -34,13 +34,19 @@ class MyApp extends StatelessWidget {
           color: Colors.white,
           elevation: 0.0,
         ),
-        fontFamily: "Exo2",
+        fontFamily: "Quicksand",
         primaryColor: Colors.black,
         accentColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: Home(),
-      title: "Qeydlərim",
+      initialRoute: "/",
+      routes: {
+        "/": (context) => Home(), 
+        "/deleted": (context) => Deleted(), 
+        "/archieved": (context) => Archieved(),
+        "/settings": (context) => Settings(),
+      },
+      title: "minimalist's notes",
     );
   }
 }

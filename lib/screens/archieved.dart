@@ -5,16 +5,16 @@ import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/notecard.dart';
 import 'package:qeydlerim/widgets/threedots.dart';
 
-class Archieved extends StatelessWidget {
+class Archieved extends StatefulWidget {
+  @override
+  _ArchievedState createState() => _ArchievedState();
+}
+
+class _ArchievedState extends State<Archieved> {
   DatabaseService databaseService = new DatabaseService();
 
-  List<Note> archievedNotes = [];
-
   _getArchievedNotes() async {
-    await databaseService
-        .getArchievedNotesList()
-        .then((fetchedNotes) => archievedNotes = fetchedNotes);
-    return archievedNotes;
+    return await databaseService.getArchievedNotesList();
   }
 
   @override
@@ -27,34 +27,38 @@ class Archieved extends StatelessWidget {
     );
   }
 
-  FutureBuilder _body() {
+  Widget _body() {
     return FutureBuilder(
-        future: _getArchievedNotes(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return ThreeDots();
-          }
+      future: _getArchievedNotes(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
           if (snapshot.data.isEmpty) {
             return Center(
-              child: Text("No archieved notes."),
+              child: Text(
+                "No archieved notes.",
+                style: Theme.of(context).textTheme.body1,
+              ),
             );
+          } else {
+            return _displayArchievedNotes(snapshot.data);
           }
-          return _displayArchievedNotes(snapshot.data);
-        },
-      );
+        }
+        return ThreeDots();
+      },
+    );
   }
 
-  AppBar _appBar(BuildContext context) {
+  Widget _appBar(BuildContext context) {
     return AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Archieve",
-          style: TextStyle(color: Colors.black),
-        ),
-      );
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Text(
+        "Archieve",
+        style: TextStyle(color: Colors.black),
+      ),
+    );
   }
 
   Widget _displayArchievedNotes(List<Note> archievedNotes) {

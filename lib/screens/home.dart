@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
 import 'package:qeydlerim/models/note.dart';
+import 'package:qeydlerim/providers/notes.dart';
 import 'package:qeydlerim/screens/add.dart';
 import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/menudrawer.dart';
@@ -18,11 +20,8 @@ class _HomeState extends State<Home> {
 
   DatabaseService databaseService = new DatabaseService();
 
-  List<Note> notes = [];
-
   Future<List<Note>> _getNotes() async {
-    await databaseService.getNoteList().then((notesList) => notes = notesList);
-    return notes;
+    return await databaseService.getNoteList();
   }
 
   @override
@@ -38,64 +37,73 @@ class _HomeState extends State<Home> {
     );
   }
 
-  FloatingActionButton _addButton(BuildContext context) {
+  Widget _addButton(BuildContext context) {
     return FloatingActionButton.extended(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        tooltip: "Add",
-        label: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-            context, CupertinoPageRoute(builder: (context) => Add())),
-      );
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      tooltip: "Add",
+      label: Icon(Icons.add),
+      onPressed: () => Navigator.push(
+          context, CupertinoPageRoute(builder: (context) => Add())),
+    );
   }
 
-  FutureBuilder<List<Note>> _body() {
+  Widget _body() {
     return FutureBuilder(
-        future: _getNotes(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return ThreeDots();
-          }
-          if (snapshot.data.length == 0) {
+      future: _getNotes(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data.isEmpty) {
             return Center(
               child: Text(
                 "No notes, yet.",
                 style: Theme.of(context).textTheme.body1,
               ),
             );
+          } else {
+            Provider.of<NotesProvider>(context).showSearch = true;
+            return displayNotes(snapshot);
           }
-          return displayNotes(snapshot);
-        },
-      );
+        }
+        return ThreeDots();
+      },
+    );
   }
 
   AppBar _appBar() {
     return AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.sort, color: Colors.black),
-          onPressed: () => _scaffoldKey.currentState.openDrawer(),
-        ),
-        backgroundColor: Colors.white,
-        title: Text(
-          "myMinimalNotes",
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        actions: notes.isEmpty
-            ? <Widget>[]
-            : <Widget>[
-                IconButton(
-                  icon: Icon(Icons.search, color: Colors.black),
-                  onPressed: () {},
-                ),
-              ],
-      );
+      leading: IconButton(
+        icon: Icon(Icons.sort, color: Colors.black),
+        onPressed: () => _scaffoldKey.currentState.openDrawer(),
+      ),
+      backgroundColor: Colors.white,
+      title: Text(
+        "minimalist's notes",
+        style: TextStyle(color: Colors.black),
+      ),
+      centerTitle: true,
+      elevation: 0.0,
+      actions: Provider.of<NotesProvider>(context).showSearch
+          ? <Widget>[]
+          : <Widget>[
+              Consumer<NotesProvider>(
+                builder: (context, notesProvider, child) {
+                  return IconButton(
+                    icon: Icon(Icons.search, color: Colors.black),
+                    onPressed: () {
+                      // TODO: add search functionality
+                    },
+                  );
+                },
+              ),
+            ],
+    );
   }
 
   Widget displayNotes(snapshot) => AnimationLimiter(
         child: ListView.builder(
+          physics: BouncingScrollPhysics(),
           itemCount: snapshot.data.length,
           itemBuilder: (context, index) {
             return AnimationConfiguration.staggeredList(

@@ -5,8 +5,14 @@ import 'package:qeydlerim/services/database.dart';
 import 'package:qeydlerim/widgets/notecard.dart';
 import 'package:qeydlerim/widgets/threedots.dart';
 
-class Deleted extends StatelessWidget {
+class Deleted extends StatefulWidget {
+  @override
+  _DeletedState createState() => _DeletedState();
+}
+
+class _DeletedState extends State<Deleted> {
   List<Note> deletedNotes = new List<Note>();
+
   DatabaseService databaseService = new DatabaseService();
 
   _getDeletedNotes() async {
@@ -15,26 +21,32 @@ class Deleted extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(context),
-      body: _body(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: _appBar(context),
+        body: _body(),
+      ),
     );
   }
 
-  FutureBuilder _body() {
+  Widget _body() {
     return FutureBuilder(
       future: _getDeletedNotes(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return ThreeDots();
+        if (snapshot.hasData) {
+          if (snapshot.data.isEmpty) {
+            return Center(
+              child: Text(
+                "No deleted notes.",
+                style: Theme.of(context).textTheme.body1,
+              ),
+            );
+          } else {
+            return _displayDeletedNotes(snapshot.data);
+          }
         }
-        if (snapshot.data.isEmpty) {
-          return Center(
-            child: Text("No deleted notes.",
-                style: Theme.of(context).textTheme.body1),
-          );
-        }
-        return _displayDeletedNotes(snapshot.data);
+
+        return ThreeDots();
       },
     );
   }
@@ -47,7 +59,9 @@ class Deleted extends StatelessWidget {
       ),
       title: Text(
         "Deleteds",
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          color: Colors.black,
+        ),
       ),
     );
   }
@@ -55,6 +69,7 @@ class Deleted extends StatelessWidget {
   Widget _displayDeletedNotes(List<Note> deletedNotes) {
     return AnimationLimiter(
       child: ListView.builder(
+        physics: BouncingScrollPhysics(),
         itemCount: deletedNotes.length,
         itemBuilder: (context, index) {
           return AnimationConfiguration.staggeredList(

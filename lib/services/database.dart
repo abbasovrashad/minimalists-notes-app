@@ -54,8 +54,9 @@ class DatabaseService {
   Future<int> unarchieveNote(int id) async {
     Database db = await this.database;
     return await db.rawUpdate(
-        "UPDATE $notetable SET $COL_IS_ARCHIEVED = ? WHERE $COL_ID = ?",
-        [0, id]);
+      "UPDATE $notetable SET $COL_IS_ARCHIEVED = ? WHERE $COL_ID = ?",
+      [0, id],
+    );
   }
 
   Future<int> insert(Note note) async {
@@ -80,8 +81,10 @@ class DatabaseService {
 
   Future<List<Note>> getNoteList() async {
     Database db = await this.database;
-    List<Map<String, dynamic>> noteMapList = await db
-        .rawQuery("SELECT * FROM $notetable WHERE $COL_IS_ARCHIEVED = ?", [0]);
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(
+      "SELECT * FROM $notetable WHERE $COL_IS_ARCHIEVED = ? AND $COL_IS_DELETED = ?",
+      [0, 0],
+    );
 
     List<Note> notes = List<Note>();
     for (int i = 0; i < noteMapList.length; i++) {
@@ -90,17 +93,21 @@ class DatabaseService {
     return notes;
   }
 
-  Future<void> moveToDeletedNotes(int id) async {
+  Future<int> moveToDeletedNotes(int id) async {
     Database db = await this.database;
     await db.rawQuery(
-        "UPDATE $notetable SET $COL_IS_DELETED = ? WHERE $COL_ID = ?",
-        [1, id]);
+      "UPDATE $notetable SET $COL_IS_DELETED = ? WHERE $COL_ID = ?",
+      [1, id],
+    );
+    return id;
   }
 
   Future<List<Note>> getArchievedNotesList() async {
     Database db = await this.database;
-    List<Map<String, dynamic>> noteMapList = await db
-        .rawQuery("SELECT * FROM $notetable WHERE $COL_IS_ARCHIEVED = ?", [1]);
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(
+      "SELECT * FROM $notetable WHERE $COL_IS_ARCHIEVED = ?",
+      [1],
+    );
 
     List<Note> archievedNotes = new List<Note>();
     for (int i = 0; i < noteMapList.length; i++) {
@@ -111,8 +118,10 @@ class DatabaseService {
 
   Future<List<Note>> getDeletedNotesList() async {
     Database db = await this.database;
-    List<Map<String, dynamic>> notesMapList = await db
-        .rawQuery("SELECT * FROM $notetable WHERE $COL_IS_DELETED = ?", [1]);
+    List<Map<String, dynamic>> notesMapList = await db.rawQuery(
+      "SELECT * FROM $notetable WHERE $COL_IS_DELETED = ?",
+      [1],
+    );
 
     List<Note> deletedNotes = new List<Note>();
     for (int i = 0; i < notesMapList.length; i++) {

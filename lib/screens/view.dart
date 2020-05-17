@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qeydlerim/models/note.dart';
 import 'package:qeydlerim/providers/notes.dart';
 import 'package:qeydlerim/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:qeydlerim/widgets/custom_toast.dart';
 
 class View extends StatefulWidget {
   final Note note;
@@ -50,11 +50,6 @@ class _ViewState extends State<View> {
           onChanged: (description) => notesProvider.description = description,
           style: Theme.of(context).textTheme.body1,
           decoration: InputDecoration(
-            hintText: "[your note here..]",
-            hintStyle: Theme.of(context)
-                .textTheme
-                .body1
-                .copyWith(color: Colors.black54),
             border: InputBorder.none,
           ),
           maxLines: (MediaQuery.of(context).size.height).ceil(),
@@ -126,29 +121,19 @@ class _ViewState extends State<View> {
   }
 
   void _archieve(int id) async {
-    await databaseService.archieveNote(id);
-    Navigator.pop(context);
-    Fluttertoast.showToast(
-      msg: "NOTE ARCHIVED",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 18.0,
-    );
+    final result = await databaseService.archieveNote(id);
+    if (result != null) {
+      CustomToast.display(text: "NOTE ARCHIVED");
+      Navigator.of(context).popUntil(ModalRoute.withName("/"));
+    }
   }
 
   void _unarchieve(int id) async {
-    await databaseService.unarchieveNote(id);
-    Navigator.pop(context);
-    Fluttertoast.showToast(
-      msg: "NOTE UNARCHIVED",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 18.0,
-    );
+    final result = await databaseService.unarchieveNote(id);
+    if (result != null) {
+      Navigator.pop(context);
+      CustomToast.display(text: "NOTE UNARCHIVED");
+    }
   }
 
   void _deleteDialog(int id, int isDeleted) async {
@@ -192,48 +177,34 @@ class _ViewState extends State<View> {
 
   void _update(notesProvider) async {
     Note updatedNote = new Note.withID(
-        widget.note.id,
-        titleController.text,
-        descriptionController.text,
-        widget.note.date,
-        1,
-        widget.note.isArchieved,
-        widget.note.isDeleted);
-
-    databaseService.update(updatedNote);
-    Fluttertoast.showToast(
-      msg: "CHANGES SAVED",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.green[400],
-      textColor: Colors.white,
-      fontSize: 18.0,
+      widget.note.id,
+      titleController.text,
+      descriptionController.text,
+      widget.note.date,
+      1,
+      widget.note.isArchieved,
+      widget.note.isDeleted,
     );
+
+    final result = await databaseService.update(updatedNote);
+    if (result != null) {
+      CustomToast.display(text: "CHANGES SAVED", positive: true);
+    }
   }
 
   void _delete(int id, int isDeleted) async {
     if (isDeleted == 0) {
-      await databaseService.moveToDeletedNotes(id);
-      Navigator.pop(context);
-      Fluttertoast.showToast(
-        msg: "NOTE MOVED TO DELETEDS",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 18.0,
-      );
+      final result = await databaseService.moveToDeletedNotes(id);
+      if (result != null) {
+        CustomToast.display(text: "NOTE MOVED TO DELETEDS");
+        Navigator.of(context).popUntil(ModalRoute.withName("/"));
+      }
     } else {
-      await databaseService.deleteCompletely(id);
-      Navigator.pop(context);
-      Fluttertoast.showToast(
-        msg: "NOTE DELETED PERMANENTLY",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 18.0,
-      );
+      final result = await databaseService.deleteCompletely(id);
+      if (result != null) {
+        CustomToast.display(text: "NOTE DELETED PERMANENTLY");
+        Navigator.of(context).popUntil(ModalRoute.withName("/"));
+      }
     }
   }
 

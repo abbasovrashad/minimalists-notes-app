@@ -29,7 +29,7 @@ class NoteCard extends StatelessWidget {
                     : Text(note.title),
                 SizedBox(height: 5.0),
                 Text(note.description ?? "",
-                    style: Theme.of(context).textTheme.body2),
+                    style: Theme.of(context).textTheme.body2,),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(

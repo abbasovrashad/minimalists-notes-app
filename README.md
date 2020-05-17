@@ -1,0 +1,2 @@
+# minimalist's notes app
+

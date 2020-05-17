@@ -5,6 +5,7 @@ class NotesProvider with ChangeNotifier {
   String title;
   String description;
   bool showFAB = false;
+  bool showSearch = false;
 
   void nullify(){
     title = null;

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qeydlerim/screens/archieved.dart';
-import 'package:qeydlerim/screens/deleted.dart';
+import 'package:flutter_brand_icons/flutter_brand_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MenuDrawer extends StatelessWidget {
   @override
@@ -9,37 +9,51 @@ class MenuDrawer extends StatelessWidget {
     return Drawer(
       child: Container(
         color: Colors.black,
-        child: ListView(
+        child: Column(
           children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                "myMinimalNotes",
-                style: Theme.of(context)
-                    .textTheme
-                    .body1
-                    .copyWith(color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            _drawerHeader(context),
             InkWell(
               child: _listTile("Archieve", context),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    CupertinoPageRoute(builder: (context) => Archieved()));
-              },
+              onTap: () => Navigator.of(context).popAndPushNamed("/archieved"),
             ),
             InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context,
-                      CupertinoPageRoute(builder: (context) => Deleted()));
-                },
-                child: _listTile("Deleteds", context)),
-            // _listTile("Ayarlar", context),
+              child: _listTile("Deleted", context),
+              onTap: () => Navigator.of(context).popAndPushNamed("/deleted"),
+            ),
+            InkWell(
+              child: _listTile("Settings", context),
+              onTap: () => Navigator.of(context).popAndPushNamed("/settings"),
+            ),
+            Spacer(),
+            _repoLink(),
+            SizedBox(height: 20.0),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _drawerHeader(BuildContext context) {
+    return DrawerHeader(
+      child: Text(
+        "minimalist's notes",
+        style: Theme.of(context).textTheme.body1.copyWith(color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _repoLink() {
+    return IconButton(
+      icon: Icon(
+        BrandIcons.github,
+        color: Colors.white,
+        size: 40.0,
+      ),
+      onPressed: () async {
+        final repo = "https://github.com/kamranbekirovyz/minimalists-notes-app";
+        if (await canLaunch(repo)) launch(repo);
+      },
     );
   }
 
@@ -47,8 +61,9 @@ class MenuDrawer extends StatelessWidget {
         leading: Icon(Icons.change_history, color: Colors.white70),
         title: Text(
           text,
-          style:
-              Theme.of(context).textTheme.body1.copyWith(color: Colors.white),
+          style: Theme.of(context).textTheme.body1.copyWith(
+                color: Colors.white,
+              ),
         ),
       );
 }
